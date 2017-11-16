@@ -10,7 +10,7 @@
 #   plain text
 #
 # PLATFORMS:
-#   Linux
+#   POSIX
 #
 # DEPENDENCIES:
 #   gem: sensu-plugin
@@ -21,7 +21,7 @@
 #
 
 require 'sensu-plugin/check/cli'
-require 'English'
+require 'open3'
 
 class CheckUninterruptibleSleep < Sensu::Plugin::Check::CLI
   option :warning_threshold,
@@ -39,9 +39,9 @@ class CheckUninterruptibleSleep < Sensu::Plugin::Check::CLI
          proc: proc(&:to_i)
 
   def process_states
-    output = `ps -h  -o s`
-    raise 'execution of `ps` command failed' unless $CHILD_STATUS.exitstatus.zero?
-    output.lines
+    stdout, stderr, status = Open3.capture3('ps', '-h', '-o', 's')
+    raise "ps command failed: #{stderr}" unless status.success?
+    stdout.lines
   end
 
   def run
