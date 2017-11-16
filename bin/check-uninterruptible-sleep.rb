@@ -40,7 +40,7 @@ class CheckUninterruptibleSleep < Sensu::Plugin::Check::CLI
 
   def process_states
     stdout, stderr, status = Open3.capture3('ps', '-h', '-o', 's')
-    raise "ps command failed: #{stderr}" unless status.success?
+    raise "ps command failed with exit code #{status.exitstatus}: #{stderr}" unless status.success?
     stdout.lines
   end
 
